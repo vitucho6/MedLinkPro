@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedLink - Plataforma Profissional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Neutral background for login */
+        }
+        .primary-text { color: #0d244f; }
+        .secondary-text { color: #4b5563; }
+        .accent-blue-logo { background-color: #25A9E0; }
+        .screen { display: none; }
+        .screen.active { display: flex; }
+        .stat-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            display: none;
+        }
+        /* Sidebar active item colors */
+        .nav-item-active {
+            background-color: #E9F7FE; 
+            color: #0d244f;
+            font-weight: 600;
+        }
+        .spinner { 
+            border: 4px solid rgba(255, 255, 255, 0.3); 
+            width: 36px; 
+            height: 36px; 
+            border-radius: 50%; 
+            border-left-color: #ffffff; 
+            animation: spin 1s ease infinite; 
+        }
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+
+        /* Dark Mode Styles */
+        .dark, .dark body { background-color: #111827; color: #d1d5db;}
+        .dark .bg-white { background-color: #1f2937; }
+        .dark .primary-text { color: #f9fafb; }
+        .dark .secondary-text { color: #9ca3af; }
+        .dark .border, .dark .border-r, .dark .border-b, .dark .border-t { border-color: #374151; }
+        .dark .bg-gray-50 { background-color: #111827; }
+        .dark .bg-gray-100 { background-color: #374151; }
+        .dark input, .dark select, .dark textarea { background-color: #374151; color: #f9fafb; border-color: #4b5563; }
+        .dark .nav-item-active { background-color: #1e3a8a; color: #f9fafb; }
+        .dark .text-gray-700 { color: #d1d5db; }
+        .dark .text-gray-500 { color: #9ca3af; }
+        .dark .shadow-md { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4); }
+        .dark .shadow-2xl { box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5); }
+        .dark #patient-search-results { background-color: #374151; border-color: #4b5563; }
+        .dark .hover\:bg-gray-100:hover { background-color: #374151; }
+        .dark .text-blue-600 { color: #60a5fa; }
+        .dark td, .dark th { color: #d1d5db; }
+        .dark .bg-yellow-200 { background-color: #4a4a2a; }
+        .dark .text-yellow-800 { color: #fef08a; }
+        .dark .bg-green-200 { background-color: #164e3b; }
+        .dark .text-green-800 { color: #86efac; }
+        .dark .text-red-500 { color: #f87171; }
+        .dark .stat-card { background-color: #1f2937; }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+    <!-- Splash Screen -->
+    <div id="professional-splash-screen" class="screen active flex-col items-center justify-center w-full h-full fixed inset-0" style="background-color: #0d244f;">
+        <div class="text-center">
+            <svg class="h-24 w-auto mx-auto" viewBox="0 0 132 114" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M51.5832 0.733398H80.4165V42.0667H121.75V70.9H80.4165V112.233H51.5832V70.9H10.2499V42.0667H51.5832V0.733398Z" fill="#25A9E0"/>
+                <g fill="white"><path d="M65.9998 83.4333C69.9539 83.4333 73.1665 80.2207 73.1665 76.2667C73.1665 72.3126 69.9539 69.1 65.9998 69.1C62.0458 69.1 58.8332 72.3126 58.8332 76.2667C58.8332 80.2207 62.0458 83.4333 65.9998 83.4333Z"/><path d="M88.8332 56.5667C92.7872 56.5667 95.9998 53.3541 95.9998 49.4C95.9998 45.4459 92.7872 42.2334 88.8332 42.2334C84.8791 42.2334 81.6665 45.4459 81.6665 49.4C81.6665 53.3541 84.8791 56.5667 88.8332 56.5667Z"/><path d="M43.1665 56.5667C47.1206 56.5667 50.3332 53.3541 50.3332 49.4C50.3332 45.4459 47.1206 42.2334 43.1665 42.2334C39.2125 42.2334 35.9998 45.4459 35.9998 49.4C35.9998 53.3541 39.2125 56.5667 43.1665 56.5667Z"/></g>
+                <g stroke="#0d244f" stroke-width="7.16667" stroke-linecap="round"><path d="M71.4998 70.9L83.4165 56.5667"/><path d="M51.5832 56.5667L62.0498 69.1"/></g>
+            </svg>
+            <h1 class="text-4xl font-bold mt-4 text-white">MedLink Pro</h1>
+            <p class="text-gray-300">Plataforma Profissional</p>
+        </div>
+        <div class="spinner mt-12"></div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="screen w-full max-w-md mx-auto">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl">
+            <div class="text-center mb-10">
+                <svg class="h-20 w-auto mx-auto" viewBox="0 0 132 114" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M51.5832 0.733398H80.4165V42.0667H121.75V70.9H80.4165V112.233H51.5832V70.9H10.2499V42.0667H51.5832V0.733398Z" fill="#25A9E0"/>
+                    <g fill="white"><path d="M65.9998 83.4333C69.9539 83.4333 73.1665 80.2207 73.1665 76.2667C73.1665 72.3126 69.9539 69.1 65.9998 69.1C62.0458 69.1 58.8332 72.3126 58.8332 76.2667C58.8332 80.2207 62.0458 83.4333 65.9998 83.4333Z"/><path d="M88.8332 56.5667C92.7872 56.5667 95.9998 53.3541 95.9998 49.4C95.9998 45.4459 92.7872 42.2334 88.8332 42.2334C84.8791 42.2334 81.6665 45.4459 81.6665 49.4C81.6665 53.3541 84.8791 56.5667 88.8332 56.5667Z"/><path d="M43.1665 56.5667C47.1206 56.5667 50.3332 53.3541 50.3332 49.4C50.3332 45.4459 47.1206 42.2334 43.1665 42.2334C39.2125 42.2334 35.9998 45.4459 35.9998 49.4C35.9998 53.3541 39.2125 56.5667 43.1665 56.5667Z"/></g>
+                    <g stroke="white" stroke-width="7.16667" stroke-linecap="round"><path d="M71.4998 70.9L83.4165 56.5667"/><path d="M51.5832 56.5667L62.0498 69.1"/></g>
+                </svg>
+                <h1 class="text-3xl font-bold mt-4 primary-text">Plataforma Profissional</h1>
+                <p class="secondary-text">Acesso para Hospitais e Farmácias</p>
+            </div>
+            <form id="professional-login-form" class="space-y-6">
+                <div>
+                    <label for="professional-type" class="font-semibold secondary-text">Tipo de Instituição</label>
+                    <select id="professional-type" class="w-full mt-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="hospital">Hospital</option>
+                        <option value="pharmacy">Farmácia</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="professional-identifier" class="font-semibold secondary-text">Email ou ID da Instituição</label>
+                    <input type="text" id="professional-identifier" class="w-full mt-1 p-3 border border-gray-300 rounded-lg" placeholder="Ex: seuemail@dominio.com ou hospital-1">
+                </div>
+                <div class="relative">
+                    <label for="professional-password" class="font-semibold secondary-text">Palavra-passe</label>
+                    <input type="password" id="professional-password" class="w-full mt-1 p-3 border border-gray-300 rounded-lg pr-10">
+                    <i id="login-eye-icon" class="fa-solid fa-eye absolute top-10 right-3 cursor-pointer text-gray-400" onclick="togglePasswordVisibility('professional-password', 'login-eye-icon')"></i>
+                </div>
+                <p id="professional-login-error" class="error-message">ID ou palavra-passe inválidos.</p>
+                <button type="submit" class="w-full accent-blue-logo text-white font-bold py-3 px-4 rounded-lg shadow-md hover:opacity-90 transition-opacity text-lg">Entrar</button>
+            </form>
+            <div class="text-center mt-6">
+                <p class="secondary-text">Não tem uma conta? 
+                    <a href="#" onclick="showScreen('register-screen')" class="font-semibold text-blue-600 hover:underline">Crie uma aqui</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Register Screen -->
+    <div id="register-screen" class="screen w-full max-w-md mx-auto">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl">
+            <h1 class="text-3xl font-bold mb-6 primary-text">Criar Conta de Instituição</h1>
+            <form id="professional-register-form" class="space-y-4">
+                 <div>
+                    <label for="register-professional-type" class="font-semibold secondary-text">Tipo de Instituição</label>
+                    <select id="register-professional-type" class="w-full mt-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="hospital">Hospital</option>
+                        <option value="pharmacy">Farmácia</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="register-professional-name" class="font-semibold secondary-text">Nome da Instituição</label>
+                    <input type="text" id="register-professional-name" class="w-full mt-1 p-3 border border-gray-300 rounded-lg" required>
+                </div>
+                 <div>
+                    <label for="register-professional-address" class="font-semibold secondary-text">Endereço</label>
+                    <input type="text" id="register-professional-address" class="w-full mt-1 p-3 border border-gray-300 rounded-lg" placeholder="Ex: Rua da Liberdade, Luanda" required>
+                </div>
+                <div>
+                    <label for="register-professional-id" class="font-semibold secondary-text">ID da Instituição (único)</label>
+                    <input type="text" id="register-professional-id" class="w-full mt-1 p-3 border border-gray-300 rounded-lg" required>
+                    <p id="register-id-error" class="error-message">Este ID já está em uso.</p>
+                </div>
+                <div>
+                    <label for="register-professional-email" class="font-semibold secondary-text">Email de Contacto</label>
+                    <input type="email" id="register-professional-email" class="w-full mt-1 p-3 border border-gray-300 rounded-lg" required>
+                    <p id="register-email-error" class="error-message">Este email já está em uso.</p>
+                </div>
+                <div class="relative">
+                    <label for="register-professional-password" class="font-semibold secondary-text">Palavra-passe</label>
+                    <input type="password" id="register-professional-password" class="w-full mt-1 p-3 border border-gray-300 rounded-lg pr-10" required>
+                    <i id="register-eye-icon" class="fa-solid fa-eye absolute top-9 right-3 cursor-pointer text-gray-400" onclick="togglePasswordVisibility('register-professional-password', 'register-eye-icon')"></i>
+                    <p id="register-password-error" class="error-message">Mínimo 8 caracteres, com letras e números.</p>
+                </div>
+                <button type="submit" class="w-full accent-blue-logo text-white font-bold py-3 px-4 rounded-lg shadow-md hover:opacity-90 transition-opacity text-lg !mt-8">Registar</button>
+            </form>
+            <div class="text-center mt-6">
+                <p class="secondary-text">Já tem uma conta? 
+                    <a href="#" onclick="showScreen('login-screen')" class="font-semibold text-blue-600 hover:underline">Faça login</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Main Platform View -->
+    <div id="professional-platform-screen" class="screen hidden w-full h-screen">
+        <aside id="professional-sidebar" class="w-64 flex flex-col bg-white border-r border-gray-200 fixed h-full z-20 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+            <div class="h-20 flex items-center justify-center text-2xl font-bold primary-text border-b border-gray-200">
+                MedLink Pro
+            </div>
+            <nav id="professional-nav" class="flex-1 px-4 py-8 space-y-2">
+                <!-- Nav items are dynamically added here -->
+            </nav>
+            <div class="p-4 border-t border-gray-200">
+                <a href="#" onclick="professionalLogout()" class="flex items-center p-2 rounded-lg text-gray-700 hover:bg-gray-100">
+                    <i class="fa-solid fa-right-from-bracket w-6"></i>
+                    <span>Sair</span>
+                </a>
+            </div>
+        </aside>
+        <main id="professional-main-content" class="flex-1 flex flex-col bg-gray-50 lg:ml-64">
+            <header class="h-20 bg-white shadow-md flex items-center justify-between px-8">
+                <div class="flex items-center">
+                    <button id="sidebar-toggle" class="lg:hidden text-2xl mr-4 primary-text">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 id="professional-title" class="text-2xl font-bold primary-text">Painel</h1>
+                </div>
+                <div class="flex items-center">
+                    <p class="mr-4 secondary-text hidden sm:block">Bem-vindo, <span id="professional-name" class="font-semibold primary-text"></span></p>
+                    <div class="relative">
+                        <i id="pro-notification-bell" class="fa-solid fa-bell text-xl text-gray-500 cursor-pointer"></i>
+                        <span id="pro-notification-badge" class="absolute -top-1 -right-1 block h-2.5 w-2.5 rounded-full bg-red-500 hidden"></span>
+                    </div>
+                </div>
+            </header>
+            <div id="professional-content" class="flex-1 p-8 overflow-y-auto relative">
+                <!-- Content is dynamically added here -->
+            </div>
+            <div id="pro-notifications-popup" class="hidden absolute top-20 right-8 w-80 bg-white rounded-lg shadow-xl border z-20">
+                <!-- Notifications will be rendered here -->
+            </div>
+        </main>
+    </div>
+    
+    <!-- Edit Stock Modal -->
+    <div id="edit-stock-modal" class="screen hidden items-center justify-center bg-black bg-opacity-50 fixed inset-0 z-50">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-lg">
+            <h2 class="text-2xl font-bold mb-6 primary-text">Editar Produto</h2>
+            <form id="edit-stock-form">
+                <input type="hidden" id="edit-original-item-name">
+                <div class="space-y-4">
+                    <div>
+                        <label for="edit-item-name" class="font-semibold secondary-text">Nome do Produto</label>
+                        <input type="text" id="edit-item-name" class="w-full mt-1 p-2 border border-gray-300 rounded-lg" required>
+                    </div>
+                    <div>
+                        <label for="edit-item-description" class="font-semibold secondary-text">Descrição</label>
+                        <textarea id="edit-item-description" rows="3" class="w-full mt-1 p-2 border border-gray-300 rounded-lg" required></textarea>
+                    </div>
+                     <div>
+                        <label for="edit-item-price" class="font-semibold secondary-text">Preço (AKZ)</label>
+                        <input type="number" step="0.01" id="edit-item-price" class="w-full mt-1 p-2 border border-gray-300 rounded-lg" required>
+                    </div>
+                    <div>
+                        <label for="edit-item-quantity" class="font-semibold secondary-text">Quantidade</label>
+                        <input type="number" id="edit-item-quantity" class="w-full mt-1 p-2 border border-gray-300 rounded-lg" required>
+                    </div>
+                    <div>
+                        <label for="edit-item-image" class="font-semibold secondary-text">Nova Imagem (opcional)</label>
+                        <input type="file" id="edit-item-image" class="w-full mt-1 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" accept="image/*">
+                        <img id="edit-image-preview" class="w-16 h-16 object-cover rounded-md mt-2 hidden">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-4 mt-8">
+                    <button type="button" onclick="hideEditStockModal()" class="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg">Cancelar</button>
+                    <button type="submit" class="accent-blue-logo text-white font-bold py-2 px-4 rounded-lg">Guardar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="screen hidden items-center justify-center bg-black bg-opacity-50 fixed inset-0 z-50">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md text-center">
+            <h2 class="text-xl font-bold mb-4 primary-text">Confirmar Ação</h2>
+            <p id="confirmation-message" class="secondary-text mb-6"></p>
+            <div class="flex justify-center space-x-4">
+                <button id="confirm-cancel-btn" class="bg-gray-200 text-gray-800 font-bold py-2 px-6 rounded-lg">Cancelar</button>
+                <button id="confirm-action-btn" class="bg-red-500 text-white font-bold py-2 px-6 rounded-lg">Confirmar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // --- FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyBV7yAz1rASsNmQLuRyBAv6XmHAdrvzdAs",
+          authDomain: "medlink-cd60c.firebaseapp.com",
+          projectId: "medlink-cd60c",
+          storageBucket: "medlink-cd60c.appspot.com",
+          messagingSenderId: "132755360941",
+          appId: "1:132755360941:web:035a4aa871f2bbaf278a24",
+          measurementId: "G-YTE00PXY92"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        
+        let currentProfessional = null;
+        let currentActiveScreen = '';
+
+        // --- DOM Elements ---
+        const loginForm = document.getElementById('professional-login-form');
+        const registerForm = document.getElementById('professional-register-form');
+        const professionalName = document.getElementById('professional-name');
+        const professionalTitle = document.getElementById('professional-title');
+        const professionalNav = document.getElementById('professional-nav');
+        const professionalContent = document.getElementById('professional-content');
+        const loginError = document.getElementById('professional-login-error');
+        const registerIdError = document.getElementById('register-id-error');
+        const registerPasswordError = document.getElementById('register-password-error');
+        const professionalMainContent = document.getElementById('professional-main-content');
+        const professionalSidebar = document.getElementById('professional-sidebar');
+        const editStockForm = document.getElementById('edit-stock-form');
+        const confirmationModal = document.getElementById('confirmation-modal');
+        const confirmationMessage = document.getElementById('confirmation-message');
+        const confirmActionBtn = document.getElementById('confirm-action-btn');
+        const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+
+        // --- Functions ---
+        function showScreen(screenId) {
+            document.querySelectorAll('body > .screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            currentActiveScreen = screenId;
+        }
+
+        function showConfirmationModal(message, onConfirm) {
+            confirmationMessage.textContent = message;
+            confirmActionBtn.onclick = () => {
+                onConfirm();
+                hideConfirmationModal();
+            };
+            confirmCancelBtn.onclick = hideConfirmationModal;
+            confirmationModal.classList.add('active');
+        }
+
+        function hideConfirmationModal() {
+            confirmationModal.classList.remove('active');
+        }
+
+        function togglePasswordVisibility(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        function validatePassword(password) {
+            const hasMinLength = password.length >= 8;
+            const hasLetter = /[a-zA-Z]/.test(password);
+            const hasNumber = /\d/.test(password);
+            return hasMinLength && hasLetter && hasNumber;
+        }
+        
+        async function handleRegister(event) {
+            event.preventDefault();
+            const type = document.getElementById('register-professional-type').value;
+            const name = document.getElementById('register-professional-name').value;
+            const id = document.getElementById('register-professional-id').value;
+            const email = document.getElementById('register-professional-email').value;
+            const password = document.getElementById('register-professional-password').value;
+            const address = document.getElementById('register-professional-address').value;
+            
+            const isPasswordValid = validatePassword(password);
+            if (!isPasswordValid) {
+                registerPasswordError.style.display = 'block';
+                return;
+            } else {
+                registerPasswordError.style.display = 'none';
+            }
+
+            // Check if ID is already in use
+            const idQuery = await db.collection('professionals').where('id', '==', id).get();
+            if (!idQuery.empty) {
+                document.getElementById('register-id-error').style.display = 'block';
+                return;
+            } else {
+                document.getElementById('register-id-error').style.display = 'none';
+            }
+
+            let newProfessionalData = { id, name, address, type, email };
+
+            if (type === 'hospital') {
+                newProfessionalData.waitTime = 30;
+                newProfessionalData.specialties = [{name: 'geral', description: 'Atendimento primário e de urgência.'}];
+            } else {
+                newProfessionalData.stock = {};
+            }
+            
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+
+                await db.collection('professionals').doc(user.uid).set({ ...newProfessionalData });
+                
+                currentProfessional = { uid: user.uid, ...newProfessionalData };
+                professionalName.textContent = currentProfessional.name;
+                setupDashboard();
+                showScreen('professional-platform-screen');
+
+            } catch (error) {
+                if (error.code === 'auth/email-already-in-use') {
+                    document.getElementById('register-email-error').style.display = 'block';
+                } else {
+                    console.error("Error registering:", error);
+                    alert("Ocorreu um erro ao registar. Tente novamente.");
+                }
+            }
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const identifier = document.getElementById('professional-identifier').value;
+            const password = document.getElementById('professional-password').value;
+            const errorEl = document.getElementById('professional-login-error');
+            let emailToLogin = identifier;
+
+            try {
+                // If identifier is not an email, it's an ID. We need to find the email.
+                if (!identifier.includes('@')) {
+                    const proQuery = await db.collection('professionals').where('id', '==', identifier).limit(1).get();
+                    if (proQuery.empty) {
+                        throw new Error("ID not found");
+                    }
+                    emailToLogin = proQuery.docs[0].data().email;
+                }
+                
+                await auth.signInWithEmailAndPassword(emailToLogin, password);
+                // onAuthStateChanged will handle the rest
+            } catch (error) {
+                console.error(error);
+                errorEl.textContent = "Email/ID ou palavra-passe inválidos.";
+                errorEl.style.display = 'block';
+            }
+        }
+
+        function professionalLogout() {
+            auth.signOut();
+        }
+
+        function setupDashboard() {
+            if (!currentProfessional) return;
+            
+            if (currentProfessional.type === 'hospital') {
+                setupHospitalDashboard();
+            } else {
+                setupPharmacyDashboard();
+            }
+            updateProfessionalHeader();
+        }
+        
+        function navigate(section) {
+            const activeBgClass = 'nav-item-active';
+            document.querySelectorAll('#professional-nav a').forEach(link => {
+                link.classList.remove(activeBgClass);
+                if (link.dataset.section === section) {
+                    link.classList.add(activeBgClass);
+                }
+            });
+            
+            const sectionRenderers = {
+                'dashboard': currentProfessional.type === 'hospital' ? renderHospitalDashboard : renderPharmacyDashboard,
+                'patients': renderPatientQueue,
+                'services': renderHospitalServices,
+                'communication': renderCommunication,
+                'settings': renderProfessionalSettings,
+                'inventory': renderPharmacyInventory,
+            };
+
+            if (sectionRenderers[section]) {
+                sectionRenderers[section]();
+            }
+        }
+
+        // --- HOSPITAL-SPECIFIC FUNCTIONS ---
+        function setupHospitalDashboard() {
+            professionalTitle.textContent = "Painel do Hospital";
+            professionalNav.innerHTML = `
+                <a href="#" onclick="navigate('dashboard')" data-section="dashboard" class="flex items-center p-2 rounded-lg text-gray-700 hover:bg-gray-100">
+                    <i class="fa-solid fa-chart-line w-6"></i><span>Painel</span>
+                </a>
+                <a href="#" onclick="navigate('patients')" data-section="patients" class="flex items-center p-2 rounded-lg text-gray-700 hover:bg-gray-100">
+                    <i class="fa-solid fa-users w-6"></i><span>Fila de Pacientes</span>
+                </a>
+                 <a href="#" onclick="navigate('services')" data-section="services" class="flex items-center p-2 rounded-lg text-gray-700 hover:bg-gray-100">
+                    <i class="fa-solid fa-hand-holding-medical w-6"></i><span>Serviços</span>
+                </a>
+                <a href="#" onclick="navigate('communication')" data-section="communication" class="flex items-center p-2 rounded-lg text-gray-700 hover:bg-gray-100">
+                    <i class="fa-solid fa-paper-plane w-6"></i><span>Comunicação</span>
+                </a>
+                <a href="#" onclick="navigate('settings')" data-section="settings" class="flex items-center p-2 rounded-lg text-gray-700 hover:bg-gray-100">
+                    <i class="fa-solid fa-gear w-6"></i><span>Definições</span>
+                </a>
+            `;
+            navigate('dashboard');
+        }
+        
+        function renderHospitalDashboard() { /* ... */ }
+        function renderPatientQueue(isDashboard = false, limit = null) { /* ... */ }
+        function checkInPatient(code) { /* ... */ }
+        function renderHospitalServices() { /* ... */ }
+        function removeService(serviceName) { /* ... */ }
+
+        // --- PHARMACY-SPECIFIC FUNCTIONS ---
+        function setupPharmacyDashboard() {
+            professionalTitle.textContent = "Painel da Farmácia";
+            professionalNav.innerHTML = `<a href="#" onclick="navigate('dashboard')" data-section="dashboard" class="flex items-center p-2 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fa-solid fa-chart-line w-6"></i><span>Painel</span></a><a href="#" onclick="navigate('inventory')" data-section="inventory" class="flex items-center p-2 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fa-solid fa-boxes-stacked w-6"></i><span>Produtos</span></a><a href="#" onclick="navigate('communication')" data-section="communication" class="flex items-center p-2 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fa-solid fa-paper-plane w-6"></i><span>Comunicação</span></a><a href="#" onclick="navigate('settings')" data-section="settings" class="flex items-center p-2 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fa-solid fa-gear w-6"></i><span>Definições</span></a>`;
+            navigate('dashboard');
+        }
+
+        function renderPharmacyDashboard() { /* ... */ }
+        function renderPharmacyInventory(isDashboard = false, limit = null) { /* ... */ }
+        function removeStockItem(itemName) { /* ... */ }
+        function showEditStockModal(itemName) { /* ... */ }
+        function hideEditStockModal() { /* ... */ }
+        function handleEditStock(event) { /* ... */ }
+        function renderCommunication() { /* ... */ }
+        function renderProfessionalSettings() { /* ... */ }
+
+        function updateProfessionalHeader() {
+            const badge = document.getElementById('pro-notification-badge');
+            // This needs to be connected to Firestore listener
+            badge.classList.add('hidden');
+        }
+        
+        function applyProfessionalTheme() {
+            if (localStorage.getItem('professionalTheme') === 'dark') {
+                document.body.classList.add('dark');
+            } else {
+                document.body.classList.remove('dark');
+            }
+        }
+
+        function toggleProfessionalTheme() {
+            if (localStorage.getItem('professionalTheme') === 'dark') {
+                localStorage.setItem('professionalTheme', 'light');
+            } else {
+                localStorage.setItem('professionalTheme', 'dark');
+            }
+            applyProfessionalTheme();
+        }
+
+
+        // --- Event Listeners ---
+        loginForm.addEventListener('submit', handleLogin);
+        registerForm.addEventListener('submit', handleRegister);
+        
+        // Initialize first screen
+        document.addEventListener('DOMContentLoaded', () => {
+             applyProfessionalTheme();
+             
+             auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    const proDoc = await db.collection('professionals').doc(user.uid).get();
+                    if (proDoc.exists) {
+                        currentProfessional = { uid: user.uid, ...proDoc.data() };
+                        professionalName.textContent = currentProfessional.name;
+                        setupDashboard();
+                        showScreen('professional-platform-screen');
+                    } else {
+                        // This might happen if a user exists in auth but not in the professionals collection
+                        auth.signOut();
+                    }
+                } else {
+                    currentProfessional = null;
+                    showScreen('login-screen');
+                }
+            });
+            
+            setTimeout(() => {
+                if (!auth.currentUser) {
+                    showScreen('login-screen');
+                }
+            }, 1500);
+
+            document.getElementById('sidebar-toggle').addEventListener('click', () => {
+                professionalSidebar.classList.toggle('-translate-x-full');
+            });
+        });
+
+    </script>
+</body>
+</html>
